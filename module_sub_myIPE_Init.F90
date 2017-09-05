@@ -13,7 +13,7 @@
 !-------------------------------------------- 
 !
 module module_sub_myIPE_Init
-   implicit none	
+   implicit none
 
    private
 
@@ -30,9 +30,9 @@ module module_sub_myIPE_Init
   use  module_decomp
 !---
   USE module_myIPE_Init
-  USE module_input_parameters, ONLY: read_input_parameters,utime,start_time,stop_time,HPEQ_flip,sw_perp_transport &
-&,NYEAR,NDAY,sw_output_plasma_grid &
-&,MPI_COMM_IPE,parallelBuild,mype
+  USE module_input_parameters, ONLY: read_input_parameters,utime,start_time,stop_time, &
+                                     HPEQ_flip,sw_perp_transport,NYEAR,NDAY,sw_output_plasma_grid, &
+                                     parallelBuild,mype, MPI_COMM_IPE, ut_start_perp_trans
   USE module_FIELD_LINE_GRID_MKS,ONLY: plasma_3d
   USE module_open_output_files,ONLY: open_output_files
   USE module_init_plasma_grid, ONLY: init_plasma_grid
@@ -51,7 +51,7 @@ module module_sub_myIPE_Init
   type(ESMF_Clock)     :: clock
   integer, intent(out) :: rc
 !---MPI communicator
-       integer      ::ierr, size
+       integer      :: ierr, size
        type(ESMF_VM):: vm_IPE !virtual machine  !?is this vm_local or vm_global???
 !---SMS
       integer PPP__GlobalSize(PPP_MAX_RANK,PPP_MAX_VARS)
@@ -218,7 +218,6 @@ if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
      print *, "The clock's final current time is NYEAR=", NYEAR, "/MM=", MM, "/DD=", DD, &
                " H=", H, ":M=", M, ":S=", S
      print *, "GHGM START DATETIME ", NYEAR, MM, DD, H, M, S
-     print *, "GHGM START DATETIME2 ", startTime, stopTime
      fmt = '(i2.2)'
      fmt1 = '(i4.4)'
      write (yy_str,fmt1) NYEAR
@@ -323,6 +322,9 @@ if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
 !g      ret = gptlstart ('read_input')
       CALL ESMF_LogWrite("sub-initialize_IPE: read_input_parameters", ESMF_LOGMSG_INFO, rc=rc)
       CALL read_input_parameters ( )
+      !ut_start_perp_trans = 0
+      ut_start_perp_trans = start_time 
+
 !g      ret = gptlstop  ('read_input')
 
 ! open Input/Output files
